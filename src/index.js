@@ -19,7 +19,7 @@ const store = createStore(reducer, composeEnhancers(applyMiddleware(thunk)))
 
 store.dispatch(actionCreators.initState())
 
-window.ethereum.on('accountsChanged', function (accounts) {
+if(window.ethereum) window.ethereum.on('accountsChanged', function (accounts) {
     console.log(accounts)
     store.dispatch(actionCreators.initState())
 })
