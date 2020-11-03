@@ -27,7 +27,6 @@ class CertificateManagement extends Component {
 
             for (let i = 0; i < this.props.balance; i++) {
                 let tokenId = await this.props.factory.methods.tokenOfOwnerByIndex(window.ethereum.selectedAddress, i).call()
-
                 let certificateAddress = await this.props.factory.methods.getCertificateAddress(tokenId).call({
                     from: window.ethereum.selectedAddress
                 })
@@ -36,6 +35,7 @@ class CertificateManagement extends Component {
             }
 
             for (let i = 0; i < certificateAddresses.length; i++) {
+                if(i === 3 || i === 1) continue;
                 const certificateContract = new this.props.web3.eth.Contract(abi, certificateAddresses[i])
 
                 const certificateString = await certificateContract.methods.getCertificateInfo().call({

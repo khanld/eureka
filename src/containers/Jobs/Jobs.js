@@ -4,122 +4,122 @@ import Modal from '../../components/UI/Modal/Modal'
 import Button from '../../components/UI/Button/Button'
 import Spinner from '../../components/UI/Spinner/Spinner'
 import { connect } from 'react-redux'
-import singlePostData from '../../components/JobCategoty/singlePostData'
+//import singlePostData from '../../components/JobCategoty/singlePostData'
 import ReactNotification from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
 import { store } from 'react-notifications-component';
 import * as actionCreators from '../../store/actions/actionCreators'
+import tourHistory from '../../contracts/TourHistory.json'
+import singlePostData from '../../components/JobCategoty/singlePostData'
+import FPTLogo from '../../assets/fptLogo.jpg'
+import TMALogo from '../../assets/TMALogo.jpg'
+import VNGLogo from '../../assets/vngLogo.jpg'
+import GRABLogo from '../../assets/grabLogo.png'
+import nemoABI from '../../contracts/NemoERC20.json'
+import { ERC20Address, ERC721Address } from '../../address'
+import HDWalletWeb3 from '../../HdWallet'
+import Rating from '@material-ui/lab/Rating';
+import RateWrapper from '../../hoc/RateWrapper/RateWrapper'
+import { Redirect } from "react-router-dom";
 
 class Jobs extends Component {
     state = {
         modalShow: false,
         error: false,
         loading: false,
-        singlePostData,
-        selectedId: null
+        singlePostData: [],
+        selectedId: null,
+        url: '',
+        topTour: []
     }
 
-    applyJobs = (selectedId) => {
-        this.setState((state) => ({ modalShow: !state.modalShow, selectedId }))
-        this.props.chosenJobIndex(selectedId);
-    }
+    async componentDidMount() {
+        //console.log("here");
+        window.scrollTo({ top: 0 });
+        this.setState({
+            modalShow: false,
+            error: false,
+            loading: true
+        })
 
-    refuseApplingJobs = () => {
-        this.setState((state) => ({ modalShow: false, error: false }))
-    }
-
-    submitToBlockchain = async () => {
-        try {
-            this.setState({
-                modalShow: false,
-                error: false,
-                loading: true
-            })
-
-            let certificateAddresses = [];
-            let tokenIds = []
-
-
-            for (let i = 0; i < this.props.balance; i++) {
-                let tokenId = await this.props.factory.methods.tokenOfOwnerByIndex(window.ethereum.selectedAddress, i).call()
-                let certificateAddress = await this.props.factory.methods.getCertificateAddress(tokenId).call({
-                    from: window.ethereum.selectedAddress
-                })
-                
-                tokenIds.push(tokenId)
-                certificateAddresses.push(certificateAddress)
+        let topTour = this.props.allData.map((tour, index) => {
+            return {
+                id: index,
+                thumb: {
+                    img: tour.image,
+                    tags: tour.category
+                },
+                details: {
+                    titles: [
+                        tour.header,
+                        <RateWrapper><Rating name="half-rating" defaultValue={Math.round(tour.averageRating)} readOnly /></RateWrapper>
+                    ],
+                    company: tour.creator.name,
+                    briefDesc: tour.description,
+                    address: tour.city,
+                    salary: tour.price
+                },
+                tick: false
             }
+        })
+        let data = []
+        if (this.props.TourData !== null && this.props.TourData !== undefined) {
 
-            await this.props.factory.methods.setApprovalForAccessingCertificates(
-                this.state.singlePostData[this.state.selectedId - 1].details.titles[1].replace("Pubkey: ", ""),
-                tokenIds,
-                certificateAddresses
-            ).send({
-                from: window.ethereum.selectedAddress
-            })
-
-            const singlePostData = [...this.state.singlePostData]
-            const selectedPostData = { ...singlePostData[this.state.selectedId - 1] }
-            selectedPostData.tick = true
-
-            singlePostData[this.state.selectedId - 1] = selectedPostData
-
-            store.addNotification({
-                title: "Wonderful!",
-                message: "You have applied successfully. Good luck!!",
-                type: "success",
-                insert: "top",
-                container: "bottom-right",
-                animationIn: ["animated", "fadeIn"],
-                animationOut: ["animated", "fadeOut"],
-                dismiss: {
-                  duration: 5000,
-                  onScreen: true
+            data = this.props.TourData.map((tour, index) => {
+                return {
+                    id: tour.index,
+                    thumb: {
+                        img: tour.image,
+                        tags: tour.category
+                    },
+                    details: {
+                        titles: [
+                            tour.header,
+                            <RateWrapper><Rating name="half-rating" defaultValue={Math.round(tour.averageRating)} readOnly /></RateWrapper>
+                        ],
+                        company: tour.creator.name,
+                        briefDesc: tour.description,
+                        address: tour.city,
+                        salary: tour.price
+                    },
+                    tick: false
                 }
-              });
-
-            this.setState({
-                modalShow: false,
-                error: false,
-                loading: false,
-                singlePostData
             })
-
-        } catch (error) {
-            console.log(error)
+        }
+        this.setState({
+            topTour,
+            singlePostData: data,
+            modalShow: false,
+            error: false,
+            loading: false
+        })
+    }
+    viewTour = (index) => {
+        this.setState({
+            url: `/tour/details?index=${index}&view=${1}`
+        })
+    }
+    render() {
+        if (!this.props.isLogin) {
             store.addNotification({
                 title: "Error!",
-                message: "Something went wrong! Please try it again later.",
+                message: "You have not logged in yet!",
                 type: "danger",
                 insert: "top",
                 container: "bottom-right",
                 animationIn: ["animated", "fadeIn"],
                 animationOut: ["animated", "fadeOut"],
                 dismiss: {
-                  duration: 5000,
-                  onScreen: true
+                    duration: 5000,
+                    onScreen: true
                 }
-              });
-            this.setState({
-                modalShow: false,
-                error: true,
-                loading: false
-            })
+            });
         }
-    }
-
-    render() {
-        window.scrollTo({ top: 0 });
         return (
             <React.Fragment>
-                <JobCategory onApplyHandler={this.applyJobs} singlePostData={this.state.singlePostData} />
-                {this.state.modalShow ?
-                    <Modal show={this.state.modalShow} onBackdropClickHandler={this.refuseApplingJobs}>
-                        <h3><i className="fas fa-exclamation-circle"></i></h3>
-                        <p><strong>By applying this Jobs, you give this Company the right to access your information</strong></p>
-                        <Button btnType="posterBtn" btnWidth="100px" btnHeight="35px" onSubmitHandler={this.refuseApplingJobs} >REFUSE</Button>
-                        <Button btnType="posterBtn" btnWidth="100px" btnHeight="35px" onSubmitHandler={this.submitToBlockchain}>CONTINUE</Button>
-                    </Modal> : null}
+                {!this.props.isLogin ? <Redirect to='/login' /> : null}
+                {this.props.isLogin && this.state.url !== '' ? <Redirect to={this.state.url} /> : null}
+                <JobCategory onClickHandler={this.viewTour} singlePostData={this.state.singlePostData} topTour={this.state.topTour} />
                 {this.state.loading ?
                     <div style={{ position: "fixed", width: "100%", top: "40%" }}>
                         <Spinner />
@@ -132,16 +132,33 @@ class Jobs extends Component {
     }
 }
 
+
 const mapStateToProps = (state) => {
+    let arr = null
+    if(state.user && state.TourData) {
+        arr = [...state.user.yourTour]
+        state.TourData.forEach(tour => {
+            for(let i = 0; i < arr.length; i++) {
+                let userTour = arr[i];
+                if(userTour._id === tour._id) {
+                    arr[i].index = tour.index
+                }
+            }
+        });
+    }
+    console.log(arr);
     return {
-        factory: state.factory,
+        tourChainContract: state.tourChainContract,
         web3: state.web3,
-        balance: state.balance
+        isLogin: (state.user === null || state.user === undefined) ? false : true,
+        TourData: arr,
+        allData: (state.TourData !== null && state.TourData !== undefined) ? state.TourData : []
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        updateNemo: (erc20Contract, account) => dispatch(actionCreators.updateNemo(erc20Contract, account)),
         chosenJobIndex: (index) => dispatch(actionCreators.chosenJobIndex(index))
     }
 }

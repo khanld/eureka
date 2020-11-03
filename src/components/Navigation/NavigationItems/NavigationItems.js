@@ -7,11 +7,11 @@ const NavigationItems = (props) => {
     return (
         <ul className={styles.join(' ')}>
             <NavigationItem href='/' exact>Home</NavigationItem>
-            <NavigationItem href='/jobs' exact>Jobs</NavigationItem>
-            <NavigationItem href='/guide' exact>Guide</NavigationItem>
-            <NavigationItem href='/courses' exact>Course</NavigationItem>
+            <NavigationItem href='/history' exact>History</NavigationItem>
+            <NavigationItem href='/bookings' exact>Booking</NavigationItem>
+            <NavigationItem href='/tour' exact>Tour</NavigationItem>
             <NavigationItem href='/playground' exact>Playground</NavigationItem>
-            <NavigationItem href='/marketplace' exact>MarketPlace</NavigationItem>
+            <NavigationItem href='/service' exact>Service</NavigationItem>
         </ul>
     )
 }

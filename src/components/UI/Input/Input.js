@@ -5,7 +5,7 @@ const Input = (props) => {
     return (
         <input
             className={classes.Input}
-            type="text" 
+            type={props.type ? props.type : "text"} 
             placeholder={props.placeholder}
             onChange={props.onchangedHandler}
             defaultValue={props.value} />

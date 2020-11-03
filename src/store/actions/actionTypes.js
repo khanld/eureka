@@ -3,3 +3,10 @@ export const START_ACCESSING = "START_ACCESSING";
 export const ACCESS_FAILURE = "ACCESS_FAILURE";
 
 export const CHOSEN_JOB_INDEX = "CHOSEN_JOB_INDEX";
+
+export const UPDATE_NEMO_TOKEN = "UPDATE_JCT_TOKENS"
+export const UPDATE_REGISTER = "UPDATE_REGISTER"
+
+export const LOGIN = "LOGIN"
+export const UPDATE_USER = "UPDATE_USER"
+export const UPDATE_TOUR = "UPDATE_TOUR"

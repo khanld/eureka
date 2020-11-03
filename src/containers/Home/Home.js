@@ -42,16 +42,16 @@ class Home extends Component {
                     }]} />
                 <div style={{ backgroundColor: "#f2f2f2" }}>
                     <Header
-                        subTitle="TRAINING COURSE"
+                        subTitle="TOUR CHAIN"
                         content=" Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae nostrum natus excepturi fuga ullam accusantium vel ut eveniet aut consequatur laboriosam ipsam."
-                        title="Our Courses" />
+                        title="Enjoy Your Tour" />
                     <Posters />
                 </div>
                 <NotificationArea />
                 <Wrapper>
                     <Header
-                        subTitle="ACHIEVEMENT"
-                        title="Digital Certificate"
+                        subTitle="EXPERIENCE"
+                        title="Share Your Experience"
                         content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae nostrum natus excepturi fuga ullam accusantium vel ut eveniet aut consequatur laboriosam ipsam." />
                     <MovieDetails />
                 </Wrapper>

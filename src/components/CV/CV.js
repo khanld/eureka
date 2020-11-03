@@ -5,192 +5,42 @@ import Spinner from '../UI/Spinner/Spinner'
 import ReactNotification from 'react-notifications-component'
 import 'react-notifications-component/dist/theme.css'
 import { store } from 'react-notifications-component';
-import abi from '../../contracts/Certificate.json'
 import { Route } from 'react-router-dom'
-import Certificate from '../Certificate/Certificate'
-import singlePostData from '../JobCategoty/singlePostData'
-import candidates from '../../containers/Candidates/candidates'
+import Modal from '../UI/Modal/Modal'
+import Button from '../UI/Button/Button'
+
+let url_string = null
+let url = null
+let index = null
+let userId = null
+let userData = null
+let data = null
 class CV extends React.Component {
-    state = {
-        experience: {
-            seconds: 0,
-            minutes: 0,
-            hours: 0,
-            days: 0,
-            months: 0,
-            years: 0
-        },
-        preCompanies: [],
-        positions: [],
-        loading: false,
-        certificates: [],
-        isApproved: true
-    }
-
-    componentDidUpdate() {
-        if (this.props.location.pathname === '/CV' || this.props.location.pathname === '/candidates/CV') window.scrollTo({ top: 0 })
-        else window.scrollTo({ top: 1500, behavior: 'smooth' })
-    }
-
-    async componentDidMount() {
-
-        window.scrollTo({ top: 0 })
-
-        this.setState({
-            loading: true
-        })
-        try {
-            const queryString = this.props.location.search
-            const urlParams = new URLSearchParams(queryString);
-            const entries = urlParams.entries();
-            const index = Object.fromEntries(entries).index
-
-            let isApproved = true
-            let seconds = await this.props.factory.methods.getEmployeeExperience(candidates[index].address).call()
-
-            const years = Math.floor(seconds / (12 * 30 * 24 * 60 * 60))
-            seconds %= (12 * 30 * 24 * 60 * 60)
-            const months = Math.floor(seconds / (30 * 24 * 60 * 60))
-            seconds %= (30 % 24 * 60 * 60)
-            const days = Math.floor(seconds / (24 * 60 * 60))
-            seconds %= (24 * 60 * 60)
-            const hours = Math.floor(seconds / (60 * 60))
-            seconds %= (60 * 60)
-            const minutes = Math.floor(seconds / 60)
-            seconds %= 60
-
-            const experience = { seconds, minutes, hours, days, months, years }
-
-
-
-            const preCompaniesAddresses = await this.props.factory.methods.getEmployeePrevCompanies(candidates[index].address).call()
-            const positions = []
-
-
-            let preCompanies = []
-            preCompaniesAddresses.forEach(companyAddress => {
-                singlePostData.forEach((companyInfo) => {
-                    if (companyInfo.details.titles[1].replace("Pubkey: ", "") === companyAddress)
-                        preCompanies.push(companyInfo)
-                })
-
-            })
-
-
-            for (let i = 0; i < preCompaniesAddresses.length; i++) {
-                const position = await this.props.factory.methods.positions(candidates[index].address, i).call()
-                positions.push(position)
-            }
-
-
-            //Certificate information
-            let certificateAddresses = [];
-            let certificates = []
-
-            const balance = await this.props.factory.methods.balanceOf(candidates[index].address).call()
-
-            for (let i = 0; i < balance; i++) {
-                let tokenId = await this.props.factory.methods.tokenOfOwnerByIndex(candidates[index].address, i).call()
-
-                let certificateAddress = await this.props.factory.methods.getCertificateAddress(tokenId).call({
-                    from: window.ethereum.selectedAddress
-                })
-                certificateAddresses.push(certificateAddress)
-
-
-            }
-
-
-            for (let i = 0; i < certificateAddresses.length; i++) {
-                const certificateContract = new this.props.web3.eth.Contract(abi, certificateAddresses[i])
-
-                const certificateString = await certificateContract.methods.getCertificateInfo().call({
-                    from: window.ethereum.selectedAddress
-                })
-
-                const certificateArray = certificateString.split('&')
-                const issuer = await certificateContract.methods.issuer().call()
-                const factory = await certificateContract.methods.factory().call()
-                let timeStamp = await certificateContract.methods.timeStamp().call()
-                let approverCount = await certificateContract.methods.approverCount().call()
-
-                var newDate = new Date();
-                newDate.setTime(timeStamp * 1000);
-                timeStamp = newDate.toUTCString();
-
-                const certificate = {
-                    student: certificateArray[0],
-                    dateOfBirth: certificateArray[1],
-                    major: certificateArray[2],
-                    graduationTime: certificateArray[3],
-                    degreeType: certificateArray[4].toUpperCase(),
-                    degreeClassification: certificateArray[5],
-                    modeOfStudy: certificateArray[6],
-                    certAddress: certificateAddresses[i],
-                    issuer,
-                    factory,
-                    timeStamp,
-                    approverCount
-                }
-
-                certificates.push(certificate)
-
-            }
-
-
-
-            this.setState({
-                certificates,
-                experience,
-                preCompanies,
-                positions,
-                loading: false,
-                isApproved
-            })
-        } catch (error) {
-            console.log(error)
-            this.setState({
-                loading: false,
-                isApproved: false
-            })
-            store.addNotification({
-                title: "Error!",
-                message: "Maybe you are not allow to access this information! Please try it again later.",
-                type: "danger",
-                insert: "top",
-                container: "bottom-right",
-                animationIn: ["animated", "fadeIn"],
-                animationOut: ["animated", "fadeOut"],
-                dismiss: {
-                    duration: 5000,
-                    onScreen: true
-                }
-            });
-        }
-    }
-
 
     render() {
-        if (!this.state.isApproved) this.props.history.push('/')
-
-        
-        const queryString = this.props.location.search
-        const urlParams = new URLSearchParams(queryString);
-        const entries = urlParams.entries();
-        const index = Object.fromEntries(entries).index
-
+        window.scrollTo({top: 0})
+        url_string = window.location.href;
+        url = new URL(url_string);
+        index = url.searchParams.get("index");
+        userId = url.searchParams.get("id");
+        data = this.props.TourData[index];
+        console.log("CV: ", userId, data)
+        data.tourguides.forEach(tourguide => {
+            if(tourguide._id === userId) userData = tourguide
+        });
+        console.log("CV: ", index, userId, data, userData)
         let content = (<div className="wrapper">
             <div className="sidebar-wrapper">
                 <div className="profile-container">
-                    <img className="profile" src={index ? candidates[index].src : candidates[0].src} alt="" />
-                    <h1 className="name">{index ? candidates[index].name : candidates[0].name}</h1>
-                    <h3 className="tagline">{index ? candidates[index].school : candidates[0].school}</h3>
+                    <img className="profile" src={userData.image} alt="" />
+                    <h1 className="name">{userData.name}</h1>
+                    <h3 className="tagline">Trường ĐH KInh Tế - Tài Chính TP. Hồ Chí Minh</h3>
                 </div>
 
                 <div className="contact-container container-block">
                     <ul className="list-unstyled contact-list">
-                        <li className="email"><i className="fas fa-envelope"></i><Link >alan.doe@website.com</Link></li>
-                        <li className="phone"><i className="fas fa-phone"></i><Link >0123 456 789</Link></li>
+                        <li className="email"><i className="fas fa-envelope"></i><Link >{userData.email}</Link></li>
+                        <li className="phone"><i className="fas fa-phone"></i><Link >{userData.phone}</Link></li>
                         <li className="website"><i className="fas fa-globe"></i><Link  >portfoliosite.com</Link></li>
                         <li className="linkedin"><i className="fab fa-linkedin-in"></i><Link  >linkedin.com/in/alandoe</Link></li>
                         <li className="github"><i className="fab fa-github"></i><Link  >github.com/username</Link></li>
@@ -198,14 +48,12 @@ class CV extends React.Component {
                     </ul>
                 </div>
                 <div className="education-container container-block">
-                    <Link to={`/candidates/CV/certificate${queryString}`}><h2 className="container-block-title">Education</h2></Link>
-                    {this.state.certificates.map((certificate, index) => (
-                        <div className="item" key={certificate.student + certificate.certAddress}>
-                            <h4 className="degree">{certificate.degreeType}</h4>
-                            <h5 className="meta">{certificate.major}</h5>
-                            <div className="time">{certificate.graduationTime}</div>
-                        </div>
-                    ))}
+                    <h2 className="container-block-title">Education</h2>
+                    <div className="item">
+                        <h4 className="degree">Cử nhân du lịch</h4>
+                        <h5 className="meta">Du lịch và khách sạn</h5>
+                        <div className="time">2020</div>
+                    </div>
                 </div>
 
                 <div className="languages-container container-block">
@@ -239,19 +87,19 @@ class CV extends React.Component {
 
                 <section className="section experiences-section">
                     <h2 className="section-title"><span className="icon-holder"><i className="fas fa-briefcase"></i></span>Experiences</h2>
-                    <h6 style={{ marginTop: "10px", marginBottom: "20px" }}>{this.state.experience.years} Year(s), {this.state.experience.months} Month(s), {this.state.experience.days} Day(s), {this.state.experience.hours} Hour(s), {this.state.experience.minutes} Minute(s), {this.state.experience.seconds} Second(s)</h6>
-                    {this.state.preCompanies.map((preCompany, index) => (
-                        <div className="item" key={preCompany.details.titles[2]}>
+    <h6 style={{ marginTop: "10px", marginBottom: "20px" }}>Number of tours have been guided by {userData.name}: {userData.yourTour.length} </h6>
+                    {userData.yourTour.map((tour, index) => (
+                        <div className="item" key={tour.header +'' + index}>
                             <div className="meta">
                                 <div className="upper-row">
-                                    <h2 className="job-title"><strong>{preCompany.details.titles[0]}</strong></h2>
-                                    <div className="time"><strong><i className="far fa-check-circle" style={{ color: "green", fontWeight: "none" }}></i></strong> Confirmed by Jobchain </div>
+                                    <h2 className="job-title"><strong>{tour.header}</strong></h2>
+                                    <div className="time"><strong><i className="far fa-check-circle" style={{ color: "green", fontWeight: "none" }}></i></strong> Confirmed by Nemo </div>
                                 </div>
-                                <div className="company"><strong>Company: </strong>{preCompany.details.company}</div>
-                                <div className="company"><strong>Pubkey: </strong>{preCompany.details.titles[1].replace("Pubkey: ", "")}</div>
+                                <div className="company"><strong>Rate: </strong>{tour.averageRating}</div>
+                                <div className="company"><strong>City: </strong>{tour.city}</div>
                             </div>
                             <div className="details">
-                                <p>{preCompany.details.briefDesc}</p>
+                                <p>{tour.description}</p>
                                 <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. </p>
                             </div>
                         </div>
@@ -332,43 +180,9 @@ class CV extends React.Component {
                 </section>
             </div>
         </div>)
-        if (this.state.loading) content = <div style={{ position: "fixed", top: "30%", left: "0", right: "0" }}><Spinner /></div>
         return (
             <div style={{ minHeight: "1400px" }}>
                 {content}
-                <div className="app-container">
-                    <ReactNotification />
-                </div>
-                <Route path="/candidates/CV/certificate" render={() => {
-                    return (
-                        < div style={{ minHeight: '500px', backgroundColor: "rgb(242, 242, 242)", marginTop: "30px" }}>
-                            {this.state.certificates.map(certificate => (
-                                <Certificate
-                                    key={certificate.certAddress}
-
-                                    headMaster="HEADMASTER"
-                                    school="UEF UNIVERSITY"
-                                    degreeType={certificate.degreeType}
-                                    major={certificate.major}
-                                    student={certificate.student}
-                                    dateOfBirth={certificate.dateOfBirth}
-                                    degreeClassification={certificate.degreeClassification}
-                                    modeOfStudy={certificate.modeOfStudy}
-                                    graduationTime={certificate.graduationTime}
-
-                                    title={certificate.degreeType}
-                                    content="Et tempora id nostrum saepe amet doloribus deserunt totam officiis cupiditate asperiores quasi accusantium voluptatum dolorem quae sapiente voluptatem ratione odio iure blanditiis earum fuga molestiae alias dicta perferendis inventore!"
-                                    releasedDate={certificate.timeStamp}
-                                    issuer={`Đại Học Kinh Tế - Tài Chính TP.HCM - ${certificate.issuer}`}
-                                    factory={certificate.factory}
-                                    certAddress={certificate.certAddress}
-                                    loved={Math.floor(Math.random() * 100)}
-                                    watched={certificate.approverCount}
-                                    link={`https://rinkeby.etherscan.io/address/${certificate.certAddress}`} />
-                            ))}
-                        </div>)
-                }} />
-
             </div >
         )
     }
@@ -378,8 +192,11 @@ class CV extends React.Component {
 const mapStateToProps = (state) => {
     return {
         web3: state.web3,
-        factory: state.factory
+        factory: state.factory,
+        erc20Contract: state.erc20Contract,
+        TourData: state.TourData,
     }
 }
+
 
 export default connect(mapStateToProps)(CV)

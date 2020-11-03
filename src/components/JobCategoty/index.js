@@ -7,9 +7,12 @@ import './css/font-awesome.min.css'
 import './css/linearicons.css'
 import './css/main.css'
 import locationListData from './catListData';
+import { Link } from 'react-router-dom'
+
 
 function JobCategory(params) {
-  const singlePosts = params.singlePostData.map(post => {
+  let singlePosts = []
+  if(params.singlePostData) singlePosts = params.singlePostData.map(post => {
     const tags = post.thumb.tags.map(tag => {
       return (
         <li>
@@ -19,7 +22,7 @@ function JobCategory(params) {
     })
     return (
       <div className="single-post d-flex flex-row">
-        <div className="thumb">
+        <div className="thumb" style={{paddingRight: "20px"}}>
           <img src={post.thumb.img} style={{ width: "130px", height: "95px" }} />
           <ul className="tags">
             {tags}
@@ -31,19 +34,18 @@ function JobCategory(params) {
               <a href="#">
                 <h4>{post.details.titles[0]}</h4>
               </a>
-              <h6>{post.details.titles[1]}</h6>
+              <div>{post.details.titles[1]}</div>
             </div>
             <ul className="btns">
               <li><a href="#"><span className="lnr lnr-heart"></span></a></li>
-              <li style={{ cursor: post.tick ? "not-allowed" : "pointer"}} onClick={!post.tick ? () => params.onApplyHandler(post.id) : null}>{post.tick ? <strong><i className="far fa-check-circle" style={{color: "green"}}></i></strong> : "Apply"}</li>
+              <li style={{ cursor: post.tick ? "not-allowed" : "pointer"}} onClick={!post.tick ? () => params.onClickHandler(post.id) : null}>{post.tick ? <strong><i className="far fa-check-circle" style={{color: "green"}}></i></strong> : "View"}</li>
             </ul>
           </div>
           <p>
             {post.details.briefDesc}
           </p>
-          <h5>Job Nature: {post.details.jobNature}</h5>
           <p className="address"><span className="lnr lnr-map"></span> {post.details.address}</p>
-          <p className="address"><span className="lnr lnr-database"></span> {post.details.salary}</p>
+          <p className="address"><span className="lnr lnr-database"></span> {post.details.salary} vnđ</p>
         </div>
       </div>
     )
@@ -55,11 +57,12 @@ function JobCategory(params) {
       </a></li>
     )
   })
-  const singleRateds = params.singlePostData.map(rated => {
+  const singleRateds = params.topTour.map((rated, index) => {
+    if(index === 4) return null
     return (
       <div className="active-relatedjob-carusel" style={{ marginBottom: "15px" }}>
         <div className="single-rated">
-          <img className="img-fluid" src={rated.thumb.img} style={{width: "320px", height: "120px"}} />
+          <img className="img-fluid" src={rated.thumb.img} style={{width: "320px", height: "80px"}} />
           <a href="#">
             <h4>{rated.details.titles[0]}</h4>
           </a>
@@ -67,10 +70,9 @@ function JobCategory(params) {
           <p>
             {rated.details.briefDesc}
           </p>
-          <h5>Job Nature: Full time</h5>
           <p className="address"><span className="lnr lnr-map"></span> {rated.details.address}</p>
-          <p className="address"><span className="lnr lnr-database"></span> {rated.details.salary}</p>
-          <a href="#" className="btns text-uppercase">Apply job</a>
+          <p className="address"><span className="lnr lnr-database"></span> {rated.details.salary} ethers</p>
+          <Link to={`/tour/details?index=${index}`} className="btns text-uppercase">View</Link>
         </div>
       </div>
     )
@@ -86,13 +88,13 @@ function JobCategory(params) {
           </div>
           <div className="col-lg-4 sidebar">
             <div className="single-slidebar">
-              <h4>Jobs by Location</h4>
+              <h4>Tours by Location</h4>
               <ul className="cat-list">
                 {locationList}
               </ul>
             </div>
             <div className="single-slidebar">
-              <h4>Top rated job posts</h4>
+              <h4>Top rated tour posts</h4>
               {singleRateds}
             </div>
           </div>

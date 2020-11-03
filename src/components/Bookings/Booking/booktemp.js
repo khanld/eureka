@@ -1,11 +1,95 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import * as actionCreators from '../../../store/actions/actionCreators'
+import { connect } from 'react-redux'
+import Modal from '../../../components/UI/Modal/Modal'
+import Spinner from '../../../components/UI/Spinner/Spinner'
+import Button from '../../../components/UI/Button/Button'
+import { store } from 'react-notifications-component';
+import ReactNotification from 'react-notifications-component'
+
 
 class SingleCourse extends React.Component {
+    state = {
+        modalShow: false,
+        error: false,
+        loading: false,
+        booked: false
+    }
+
+    bookTour = async () => {
+            this.setState({
+                modalShow: true,
+                error: false,
+                loading: true
+            })
+    }
+
+    cancel = () => {
+        this.setState({
+            modalShow: false,
+            error: false,
+            loading: false
+        })
+    }
+
+    continue = async () => {
+        try {
+            this.setState({
+                modalShow: false,
+                error: false,
+                loading: true
+            })
+            let tmo = await this.props.tourChainContract.methods._bookTour("0x9113A1d7A8d600f69024550C276106bDCD52259A", "Nha Trang", 1).send({
+                from: window.web3.currentProvider.selectedAddress,
+                value: this.props.web3.utils.toWei("1", 'ether')
+            })
+            
+            console.log(tmo);
+            store.addNotification({
+                title: "Wonderful!",
+                message: "You have applied successfully. Good luck!!",
+                type: "success",
+                insert: "top",
+                container: "bottom-right",
+                animationIn: ["animated", "fadeIn"],
+                animationOut: ["animated", "fadeOut"],
+                dismiss: {
+                  duration: 5000,
+                  onScreen: true
+                }
+              });
+              this.setState({
+               booked: true
+            })
+
+        } catch (error) {
+            console.log(error)
+            this.setState({
+                modalShow: false,
+                error: true,
+                loading: false
+            })
+        }
+    }
+
     render() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
         return (
             <React.Fragment>
+                {this.state.modalShow ?
+                    <Modal show={this.state.modalShow} onBackdropClickHandler={this.refuseApplingJobs}>
+                        <h3><i className="fas fa-exclamation-circle"></i></h3>
+                        <p><strong>SURE TO PURCHASE THIS TOUR</strong></p>
+                        <Button btnType="posterBtn" btnWidth="100px" btnHeight="35px" onSubmitHandler={this.cancel} >REFUSE</Button>
+                        <Button btnType="posterBtn" btnWidth="100px" btnHeight="35px" onSubmitHandler={this.continue}>CONTINUE</Button>
+                    </Modal> : null}
+                    {this.state.loading ?
+                    <div style={{ position: "fixed", width: "100%", top: "40%" }}>
+                        <Spinner />
+                    </div> : null}
+                    <div className="app-container">
+                    <ReactNotification />
+                </div>
                 <div className="breadcumb-area">
                     <nav aria-label="breadcrumb">
                         <ol className="breadcrumb">
@@ -25,13 +109,13 @@ class SingleCourse extends React.Component {
                             <i className="fa fa-star" aria-hidden="true"></i>
                             <i className="fa fa-star-o" aria-hidden="true"></i>
                         </div>
-                        <h3>English Grammar</h3>
+                        <h3>CHOOSE YOUR DESTINATION</h3>
                         <div className="meta d-flex align-items-center justify-content-center">
                             <Link to>Sarah Parker</Link>
                             <span><i className="fa fa-circle" aria-hidden="true"></i></span>
-                            <Link to>Art &amp; Design</Link>
+                            <Link to>Tour &amp; Chain</Link>
                         </div>
-                        <div className="price">Free</div>
+                        <div className="price">1 ethers</div>
                     </div>
                 </div>
 
@@ -67,13 +151,13 @@ class SingleCourse extends React.Component {
 
 
                                                     <div className="about-course mb-30">
-                                                        <h4>About this course</h4>
+                                                        <h4>About this tour</h4>
                                                         <p>Sed elementum lacus a risus luctus suscipit. Aenean sollicitudin sapien neque, in fermentum lorem dignissim a. Nullam eu mattis quam. Donec porttitor nunc a diam molestie blandit. Maecenas quis ultrices ex. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam eget vehicula lorem, vitae porta nisi. Ut vel quam erat. Ut vitae erat tincidunt, tristique mi ac, pharetra dolor. In et suscipit ex. Pellentesque aliquet velit tortor, eget placerat mi scelerisque a. Aliquam eu dui efficitur purus posuere viverra. Proin ut elit mollis, euismod diam et, fermentum enim.</p>
                                                     </div>
 
 
                                                     <div className="all-instructors mb-30">
-                                                        <h4>All Instructors</h4>
+                                                        <h4>All Tour Guides</h4>
 
                                                         <div className="row">
 
@@ -84,7 +168,7 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
+                                                                        <span>Tour Guides</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -97,7 +181,7 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
+                                                                        <span>Tour Guides</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -110,7 +194,7 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
+                                                                        <span>Tour Guides</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -123,7 +207,7 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
+                                                                        <span>Tour Guides</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -203,60 +287,60 @@ class SingleCourse extends React.Component {
 
 
                                                     <div className="curriculum-level mb-30">
-                                                        <h4 className="d-flex justify-content-between"><span>Week 1</span> <span>0/4</span></h4>
-                                                        <h5>Beginners Level</h5>
+                                                        <h4 className="d-flex justify-content-between"><span>Ngày 1</span> <span>/4</span></h4>
+                                                        <h5>Địa điểm 1</h5>
                                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce enim nulla, mollis eu metus in, sagittis fringilla.</p>
 
                                                         <ul className="curriculum-list">
-                                                            <li><i className="fa fa-file" aria-hidden="true"></i> 1 video, 1 audio, 1 reading
+                                                        <li><i className="fa fa-file" aria-hidden="true"></i> Some tiles
                                                     <ul>
                                                                     <li>
                                                                         <span><i className="fa fa-video-camera" aria-hidden="true"></i> Video: <span>Greetings and Introductions</span></span>
-                                                                        <span><i className="fa fa-clock-o" aria-hidden="true"></i> 15 minutes</span>
+                                                                        <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                                     </li>
                                                                     <li>
-                                                                        <span><i className="fa fa-file-text" aria-hidden="true"></i> Reading: <span>Word Types</span></span>
-                                                                        <span><i className="fa fa-clock-o" aria-hidden="true"></i> 15 minutes</span>
+                                                                        <span><i className="fa fa-file-text" aria-hidden="true"></i> Description: <span>Some things</span></span>
+                                                                        <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                                     </li>
                                                                     <li>
-                                                                        <span><i className="fa fa-volume-down" aria-hidden="true"></i> Audio: <span>Listening Exercise</span></span>
-                                                                        <span><i className="fa fa-clock-o" aria-hidden="true"></i> 15 minutes</span>
+                                                                        <span><i className="fa fa-volume-down" aria-hidden="true"></i> Instruction: <span>Some things</span></span>
+                                                                        <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                                     </li>
                                                                 </ul>
                                                             </li>
                                                             <li className="d-flex justify-content-between">
-                                                                <span><i className="fa fa-graduation-cap" aria-hidden="true"></i> Graded: Cumulative Language Quiz</span>
-                                                                <span>3 Questions</span>
+                                                                <span><i className="fa fa-graduation-cap" aria-hidden="true"></i> Some things</span>
+                                                                <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                             </li>
                                                         </ul>
                                                     </div>
 
 
                                                     <div className="curriculum-level mb-30">
-                                                        <h4 className="d-flex justify-content-between"><span>Week 2</span> <span>0/5</span></h4>
-                                                        <h5>Intermediate Level</h5>
+                                                        <h4 className="d-flex justify-content-between"><span>Ngày 2</span> <span>/4</span></h4>
+                                                        <h5>Địa điểm 2</h5>
                                                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce enim nulla, mollis eu metus in, sagittis fringilla.</p>
 
                                                         <ul className="curriculum-list">
-                                                            <li><i className="fa fa-file" aria-hidden="true"></i> 1 video, 1 audio, 1 reading
+                                                            <li><i className="fa fa-file" aria-hidden="true"></i> Some tiles
                                                     <ul>
                                                                     <li>
                                                                         <span><i className="fa fa-video-camera" aria-hidden="true"></i> Video: <span>Greetings and Introductions</span></span>
-                                                                        <span><i className="fa fa-clock-o" aria-hidden="true"></i> 15 minutes</span>
+                                                                        <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                                     </li>
                                                                     <li>
-                                                                        <span><i className="fa fa-file-text" aria-hidden="true"></i> Reading: <span>Word Types</span></span>
-                                                                        <span><i className="fa fa-clock-o" aria-hidden="true"></i> 15 minutes</span>
+                                                                        <span><i className="fa fa-file-text" aria-hidden="true"></i> Description: <span>Some things</span></span>
+                                                                        <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                                     </li>
                                                                     <li>
-                                                                        <span><i className="fa fa-volume-down" aria-hidden="true"></i> Audio: <span>Listening Exercise</span></span>
-                                                                        <span><i className="fa fa-clock-o" aria-hidden="true"></i> 15 minutes</span>
+                                                                        <span><i className="fa fa-volume-down" aria-hidden="true"></i> Instruction: <span>Some things</span></span>
+                                                                        <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                                     </li>
                                                                 </ul>
                                                             </li>
                                                             <li className="d-flex justify-content-between">
-                                                                <span><i className="fa fa-graduation-cap" aria-hidden="true"></i> Graded: Cumulative Language Quiz</span>
-                                                                <span>3 Questions</span>
+                                                                <span><i className="fa fa-graduation-cap" aria-hidden="true"></i> Some things</span>
+                                                                <span style={{ position: "relative" }}><i className="fa fa-clock-o" aria-hidden="true"></i><input style={{ position: "absolute", right: "100px", width: "50px", height: "20px" }} type="checkbox" onChange={() => this.onTickHandler(3)} /></span>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -295,7 +379,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>5 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style={{width: "80%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style={{ width: "80%" }}></div>
                                                                 </div>
                                                                 <span>80%</span>
                                                             </div>
@@ -303,7 +387,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>4 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style={{width: "20%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style={{ width: "20%" }}></div>
                                                                 </div>
                                                                 <span>20%</span>
                                                             </div>
@@ -311,7 +395,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>3 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{width: "0%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{ width: "0%" }}></div>
                                                                 </div>
                                                                 <span>0%</span>
                                                             </div>
@@ -319,7 +403,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>2 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{width: "0%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{ width: "0%" }}></div>
                                                                 </div>
                                                                 <span>0%</span>
                                                             </div>
@@ -327,7 +411,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>1 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{width: "0%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{ width: "0%" }}></div>
                                                                 </div>
                                                                 <span>0%</span>
                                                             </div>
@@ -407,7 +491,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -420,7 +503,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -433,7 +515,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -446,7 +527,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -459,7 +539,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -472,7 +551,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -485,7 +563,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -498,7 +575,6 @@ class SingleCourse extends React.Component {
                                                                     </div>
                                                                     <div className="instructor-info">
                                                                         <h5>Sarah Parker</h5>
-                                                                        <span>Teacher</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -539,7 +615,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>5 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar"  aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style={{width: "80%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style={{ width: "80%" }}></div>
                                                                 </div>
                                                                 <span>80%</span>
                                                             </div>
@@ -547,7 +623,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>4 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar"  aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style={{width: "20%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style={{ width: "20%" }}></div>
                                                                 </div>
                                                                 <span>20%</span>
                                                             </div>
@@ -555,7 +631,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>3 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{width: "0%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{ width: "0%" }}></div>
                                                                 </div>
                                                                 <span>0%</span>
                                                             </div>
@@ -563,7 +639,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>2 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar"  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{width: "0%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{ width: "0%" }}></div>
                                                                 </div>
                                                                 <span>0%</span>
                                                             </div>
@@ -571,7 +647,7 @@ class SingleCourse extends React.Component {
                                                             <div className="single-rating mb-15 d-flex align-items-center">
                                                                 <span>1 STARS</span>
                                                                 <div className="progress">
-                                                                    <div className="progress-bar" role="progressbar"  aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{width: "0%"}}></div>
+                                                                    <div className="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style={{ width: "0%" }}></div>
                                                                 </div>
                                                                 <span>0%</span>
                                                             </div>
@@ -637,39 +713,29 @@ class SingleCourse extends React.Component {
                             <div className="col-12 col-lg-4">
                                 <div className="course-sidebar">
 
-                                    <Link to className="btn clever-btn mb-30 w-100">Buy course</Link>
+                                    <Link to className="btn clever-btn mb-30 w-100" onClick = {this.bookTour}>{this.state.booked ? "DONE" : "Book Now"}</Link>
 
 
                                     <div className="sidebar-widget">
-                                        <h4>Course Features</h4>
+                                        <h4>Tour Features</h4>
                                         <ul className="features-list">
                                             <li>
                                                 <h6><i className="fa fa-clock-o" aria-hidden="true"></i> Duration</h6>
-                                                <h6>2 Weeks</h6>
+                                                <h6>1 Weeks</h6>
                                             </li>
                                             <li>
-                                                <h6><i className="fa fa-bell" aria-hidden="true"></i> Lectures</h6>
-                                                <h6>10</h6>
+                                                <h6><i className="fa fa-bell" aria-hidden="true"></i> Tour Guides</h6>
+                                                <h6>4</h6>
                                             </li>
                                             <li>
-                                                <h6><i className="fa fa-file" aria-hidden="true"></i> Quizzes</h6>
-                                                <h6>3</h6>
+                                                <h6><i className="fa fa-file" aria-hidden="true"></i> Vehicle</h6>
+                                                <h6>Airplance + Car</h6>
                                             </li>
                                             <li>
-                                                <h6><i className="fa fa-thumbs-up" aria-hidden="true"></i> Pass Percentage</h6>
+                                                <h6><i className="fa fa-thumbs-up" aria-hidden="true"></i> Already enrolled </h6>
                                                 <h6>60</h6>
                                             </li>
-                                            <li>
-                                                <h6><i className="fa fa-thumbs-down" aria-hidden="true"></i> Max Retakes</h6>
-                                                <h6>5</h6>
-                                            </li>
                                         </ul>
-                                    </div>
-
-
-                                    <div className="sidebar-widget">
-                                        <h4>Certification</h4>
-                                        <img src="img/bg-img/cer.png" alt="" />
                                     </div>
 
 
@@ -679,29 +745,29 @@ class SingleCourse extends React.Component {
 
                                         <div className="single--courses d-flex align-items-center">
                                             <div className="thumb">
-                                                <img src="img/bg-img/yml.jpg" alt="" />
+                                                <img src="https://media.truyenhinhdulich.vn/upload/news/154_hue.jpg" alt="" />
                                             </div>
                                             <div className="content">
-                                                <h5>Vocabulary</h5>
-                                                <h6>$20</h6>
+                                                <h5>Huế</h5>
+                                                <h6>1 ethers</h6>
                                             </div>
                                         </div>
                                         <div className="single--courses d-flex align-items-center">
                                             <div className="thumb">
-                                                <img src="img/bg-img/yml2.jpg" alt="" />
+                                                <img src="https://media.vietravel.net/Images/NewsPicture/1-doi-che-cau-dat.jpg" alt="" />
                                             </div>
                                             <div className="content">
-                                                <h5>Expository writing</h5>
-                                                <h6>$45</h6>
+                                                <h5>Đà Lạt</h5>
+                                                <h6>1 ether</h6>
                                             </div>
                                         </div>
                                         <div className="single--courses d-flex align-items-center">
                                             <div className="thumb">
-                                                <img src="img/bg-img/yml3.jpg" alt="" />
+                                                <img src="https://lh3.googleusercontent.com/proxy/DWt-peqk9_y4MsX9LAlfrkqBuXh3iwuSxPNjUwJy3XGUQWo250vHFx1BKAubMVO0-650D8dPQ1bYTbCsg4ke6fBijDxUpVCPdaoZKqfGiO8qnXfZk5bAiNL1kKyy-BUTbg" alt="" />
                                             </div>
                                             <div className="content">
-                                                <h5>Vocabulary</h5>
-                                                <h6>$20</h6>
+                                                <h5>Sa Pa</h5>
+                                                <h6>1 ether</h6>
                                             </div>
                                         </div>
                                     </div>
@@ -716,4 +782,18 @@ class SingleCourse extends React.Component {
 }
 
 
-export default SingleCourse
+const mapStateToProps = (state) => {
+    return {
+        web3: state.web3,
+        tourChainContract: state.tourChainContract
+    }
+}
+
+
+// const mapDispatchToProps = (dispatch) => {
+//     return {
+//         onUpdateJCTToken: (erc20Contract, account) => dispatch(actionCreators.updateJCTTokens(erc20Contract, account))
+//     }
+// }
+
+export default connect(mapStateToProps)(SingleCourse)

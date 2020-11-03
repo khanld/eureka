@@ -15,13 +15,13 @@ class UserLogo extends Component {
         }))
     }
 
-    async componentDidMount () {
-        const certificates = await this.props.factory.methods.getCertificateList().call({
-            from: window.ethereum.selectedAddress
-        })
-        this.setState({
-            certificates
-        })
+    async componentDidMount() {
+        // const certificates = await this.props.factory.methods.getCertificateList().call({
+        //     from: window.ethereum.selectedAddress
+        // })
+        // this.setState({
+        //     certificates
+        // })
     }
 
     render() {
@@ -31,39 +31,23 @@ class UserLogo extends Component {
         let role = "User"
         let content = (
             <React.Fragment>
-                <Link to>Your CRTs: {this.props.balance}</Link>
-                <Link to="/CV">View CV</Link>
-                <Link to="/certificates">View Certificates</Link>
+                {this.props.user ?<Link to>{this.props.user.name}</Link> : null}
+                <Link to>Your TRC: {this.props.TRCValue}</Link>
+                <Link to="/mycourses">My Trip</Link>
+                <Link to="/">Your Nemo token(s): {this.props.NemoValue}</Link>
+                {(!this.props.registered && !this.props.isLogin)?
+                    <Link to="/register">Register</Link>
+                    : null
+                }
+                {!this.props.isLogin ?
+                    <Link to="/login">Login</Link>
+                    : null
+                }
             </React.Fragment>
         )
 
         if (window.web3.currentProvider.selectedAddress === "0x9113a1d7a8d600f69024550c276106bdcd52259a") {
             role = "Founder"
-            content = (
-                <React.Fragment>
-                    <Link to="/registerIssuer">Register Issuer</Link>
-                    <Link to="/registerCompany">Register Company</Link>
-                    <Link to="/companyList">Company Management</Link>
-                    <Link to="/SchoolList">School Management</Link>
-                </React.Fragment>
-            )
-        }
-
-        if (this.props.isIssuer) {
-            role = "Issuer"
-            content = (<React.Fragment>
-                <Link to="/createCertificate">Create Certificate</Link>
-                <Link to>ToTal Creation: {this.state.certificates.length}</Link>
-                <Link to="/certificateManagement">Certificate Management</Link>
-            </React.Fragment>)
-        }
-
-        if (this.props.isCompany) {
-            role = "Company"
-            content = (<React.Fragment>
-                <Link to="/candidates">Candidates</Link>
-                <Link to="employeeManagement">Employee Management</Link>
-            </React.Fragment>)
         }
 
         return (
@@ -84,10 +68,12 @@ class UserLogo extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        balance: state.balance,
-        isIssuer: state.issuer.registered,
-        isCompany: state.company.registered,
-        factory: state.factory
+        web3: state.web3,
+        NemoValue: state.NemoValue,
+        TRCValue: state.TRCValue,
+        registered: state.registered,
+        isLogin: state.user,
+        user: state.user
     }
 }
 

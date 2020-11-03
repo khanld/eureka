@@ -18,16 +18,14 @@ const PosterInteraction = (props) => (
             </span>
         </div>
         <p>{props.content}</p>
-        {props.title ? <div>
-            <p><strong>Premiere date:</strong></p>
-            <p>{props.date}</p>
-            <p><strong>Issuer:</strong></p>
-            <p>{props.issuer}</p>
-            <p><strong>Factory Address:</strong></p>
-            <p>{props.factory}</p>
-            <p><strong>Certificate Address:</strong></p>
-            <p>{props.certAddress}</p>
-        </div> : null}
+        {props.check ?  <div>
+            <p><strong>Name: </strong> {"Phương Ly Idol"} </p>
+            <p><strong>Place: </strong> {"Hội An"} </p>
+            <p><strong>Upload date: </strong> {props.date}</p>
+            <p><strong>Public key: </strong> {props.pubKey}</p>
+        </div> : null
+        }
+        
     </div>
 )
 

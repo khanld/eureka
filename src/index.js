@@ -9,6 +9,7 @@ import { Provider } from 'react-redux'
 import reducer from './store/reducers/reducer'
 import * as actionCreators from './store/actions/actionCreators'
 import thunk from 'redux-thunk'
+import ReactNotification from 'react-notifications-component'
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
@@ -26,10 +27,13 @@ window.ethereum.on('accountsChanged', function (accounts) {
 ReactDOM.render(
     <Provider store={store}>
         <BrowserRouter>
-            <App />
+            <div className="app-container">
+                <ReactNotification />
+                <App />
+            </div>
         </BrowserRouter>
     </Provider>
-, document.getElementById('root'));
+    , document.getElementById('root'));
 
 
 // If you want your app to work offline and load faster, you can change

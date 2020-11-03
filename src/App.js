@@ -5,20 +5,21 @@ import Home from './containers/Home/Home'
 import { connect } from "react-redux"
 import Spinner from './components/UI/Spinner/Spinner'
 import { withRouter, Switch } from 'react-router-dom'
-import IusserForm from './components/Form/IssuerRegister'
-import CompanyrForm from './components/Form/CompanyRegister'
+import Form from './components/Form/IssuerRegister'
 import Companies from './containers/Manament/Companies';
 import Issuers from './containers/Manament/Issuers';
-import Certificate from './components/Form/CertificateCreation';
 import Guide from './containers/Guide/Guide';
-import Course from './components/Course/Course';
-import SingleCourse from './components/Course/SingleCourse/SingleCourse'
+import Bookings from './components/Bookings/Bookings';
+import Tour from './components/Tours/Tours';
+import Bookingdetails from './components/Bookings/Booking/Booking'
+import TourDetails from './components//Tours/Tour/Tour'
 import { Redirect } from 'react-router-dom'
-import CertificateManagement from './containers/CertificateManagement/CertificateManagement';
-import CV from './components/CV/CV';
-import LuckyWheel from './components/LuckyWheel/LuckyWheel';
+//import LuckyWheel from './components/LuckyWheel/LuckyWheel';
 import Jobs from './containers/Jobs/Jobs';
-import Candidates from './containers/Candidates/Candidate';
+import Playground from './containers/PLayground/Playground';
+import Service from './containers/Service/Service';
+import DataPackage from './containers/DataPakage/DataPackage';
+import CV from './components/CV/CV';
 
 class App extends Component {
   render() {
@@ -26,20 +27,21 @@ class App extends Component {
       <Layout inHome={this.props.location.pathname === "/"}>
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route path="/registerIssuer" component={IusserForm} />
-          <Route path="/registerCompany" component={CompanyrForm} />
+          <Route path="/register" component={()=>(<Form title="Register Form" register></Form>)} />
+          <Route path="/login" component={()=>(<Form  title="Login Form" login></Form>)} />
           <Route path="/companyList" component={Companies} />
           <Route path="/SchoolList" component={Issuers} />
-          <Route path="/createCertificate" component={Certificate} />
-          <Route path="/guide" component={Guide} />
-          <Route path="/courses" component={Course} />
-          <Route path="/singleCourse" component={SingleCourse} />
-          <Route path="/certificates" component={CertificateManagement} />
-          <Route path="/CV" component={CV} />
-          <Route path="/playground" component={LuckyWheel} />
-          <Route path="/jobs" component={Jobs} />
-          <Route path="/candidates" exact component={Candidates} />
-          <Route path="/candidates/CV" component={CV} />
+          <Route path="/bookings" exact component={Bookings} />
+          <Route path="/tour" exact component={Tour} />
+          <Route path="/tour/create" component={()=>(<Form title="Creater Tour" createTour></Form>)} />
+          <Route path="/cv" exact component={CV} />
+          <Route path="/bookings/bookingdetails" exact component={Bookingdetails} />
+          <Route path="/tour/details" exact component={TourDetails} />
+          <Route path="/tour/details/guide" exact component={Guide} />
+          <Route path="/playground" component={Playground} />
+          <Route path="/history" component={Jobs} />
+          <Route path="/service" component={Service} />
+          <Route path="/CVPackage" component={DataPackage} />
           <Redirect to="/" />
         </Switch>
       </Layout>

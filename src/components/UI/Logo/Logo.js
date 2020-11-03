@@ -9,7 +9,7 @@ const Logo = (props) => {
         <div className={["col-sm-12", setColumn, classes.Logo].join(' ')}>
             <h1 style ={{margin: "0 0 20px 0"}}>
                 <strong>
-                    <span style={{color: "#20561f"}}>Job</span>
+                    <span style={{color: "#20561f"}}>Nemo</span>
                     <span style={{color: "#093844"}}>Chain</span>
                 </strong>
                 <span style={{ color: '#a56c03', fontSize: '60px' }}>.</span>

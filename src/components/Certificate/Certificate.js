@@ -13,16 +13,7 @@ const Certificate = (props) => {
                 <div className="col-md-6">
                     <div className={classes.MoviePoster}>
                       <CertificateImage
-                        header="SOCIALIST REPUBLIC OF VIETNAM"
-                        headMaster={props.headMaster}
-                        school={props.school}
-                        degreeType={props.degreeType}
-                        major={props.major}
-                        student={props.student}
-                        dateOfBirth={props.dateOfBirth}
-                        degreeClassification={props.degreeClassification}
-                        modeOfStudy={props.modeOfStudy}
-                        graduationTime={props.graduationTime}
+                            poster={props.poster}
                         />
                     </div>
                 </div>
@@ -39,7 +30,7 @@ const Certificate = (props) => {
                             loved={Math.floor(Math.random()*100)}
                             watched={props.watched} />
                             <Button btnType="posterBtn" btnWidth="100%"><a href={props.link} style={{color: "white", display: "block"}}>VIEW ON ETHERSCAN</a></Button>
-                            <Button btnType="posterBtn" btnWidth="100%">GET MORE</Button>
+                            <Button btnType="posterBtn" btnWidth="100%">SHARE YOUR PHOTO NOW</Button>
                     </div>
                 </div>
             </div>
